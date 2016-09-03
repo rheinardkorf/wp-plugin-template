@@ -5,7 +5,7 @@
  * @package $PLUGIN_PACKAGE
  */
 
-namespace PLUGIN_NAMESPACE;
+namespace $PLUGIN_NAMESPACE;
 
 /**
  * Class Utility
