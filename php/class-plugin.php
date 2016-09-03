@@ -68,7 +68,7 @@ class Plugin extends Base {
 			'manage_options',
 			static::MENU_PARENT,
 			array( $this, 'render_main_plugin_page' ),
-			$this->info['assets_url'] . 'img/admin-menu-icon.svg'
+			$this->info['assets_url'] . 'images/admin-menu-icon.svg'
 		);
 
 		do_action( static::HOOK_PREFIX . '_submenu', static::MENU_PARENT );

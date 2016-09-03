@@ -66,7 +66,7 @@ class $PLUGIN_NAMESPACE {
 
 		$data = array(
 			'__FILE__'       => __FILE__,
-			'library_path'   => 'includes',
+			'library_path'   => 'php',
 			'assets_path'    => 'assets',
 			'api_version'    => '1',
 		);
