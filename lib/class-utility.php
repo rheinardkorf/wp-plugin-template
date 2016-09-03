@@ -259,6 +259,8 @@ class Utility {
 
 		if ( is_array( $query ) ) {
 			array_walk_recursive( $query, array( new static, 'sanitize_array_item' ) );
+		} else {
+			$query = sanitize_text_field( wp_unslash( $query ) );
 		}
 
 		if ( ! empty( $query ) || '' === $query ) {
