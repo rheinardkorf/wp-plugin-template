@@ -50,6 +50,13 @@ class Base {
 	}
 
 	/**
+	 * Base destructor.
+	 */
+	function __destruct() {
+		$this->remove_object_hooks();
+	}
+
+	/**
 	 * Use PHP DocBlocks to hook actions and filters.
 	 */
 	public function hook_by_reflection() {
@@ -72,5 +79,31 @@ class Base {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Removes the added DocBlock hooks.
+	 *
+	 * @param object $object The class object.
+	 */
+	public function remove_object_hooks( $object = null ) {
+		if ( is_null( $object ) ) {
+			$object = $this;
+		}
+		$class_name = get_class( $object );
+		$reflector = new \ReflectionObject( $object );
+		foreach ( $reflector->getMethods() as $method ) {
+			$doc = $method->getDocComment();
+			if ( preg_match_all( '#\* @(?P<type>filter|action)\s+(?P<name>[a-z0-9\-\._]+)(?:,\s+(?P<priority>\d+))?#', $doc, $matches, PREG_SET_ORDER ) ) {
+				foreach ( $matches as $match ) {
+					$type = $match['type'];
+					$name = $match['name'];
+					$priority = empty( $match['priority'] ) ? 10 : intval( $match['priority'] );
+					$callback = array( $object, $method->getName() );
+					call_user_func( "remove_{$type}", $name, $callback, $priority );
+				}
+			}
+		}
+		unset( $this->_called_doc_hooks[ $class_name ] );
 	}
 }

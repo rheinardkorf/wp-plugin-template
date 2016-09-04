@@ -66,7 +66,7 @@ class PluginTemplateNS {
 
 		$data = array(
 			'__FILE__'       => __FILE__,
-			'library_path'   => 'lib',
+			'library_path'   => 'php',
 			'assets_path'    => 'assets',
 			'api_version'    => '1',
 		);
