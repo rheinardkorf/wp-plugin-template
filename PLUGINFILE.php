@@ -1,20 +1,20 @@
 <?php
 /**
- * Plugin Name: $PLUGIN_NAME
- * Plugin URI: $PLUGIN_URI
- * Description: $PLUGIN_DESCRIPTION
- * Version: $PLUGIN_VERSION
- * Author: $PLUGIN_AUTHOR
- * Author URI: $PLUGIN_AUTHOR_URI
+ * Plugin Name: PluginName
+ * Plugin URI: http://pluginuri.com
+ * Description: PluginDescription
+ * Version: 0.0.0
+ * Author: Rheinard Korf
+ * Author URI: http://rheinardkorf.com
  * License: GPL2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: $PLUGIN_TEXT_DOMAIN
- * Domain Path: $PLUGIN_TD_PATH
- * Network: $PLUGIN_NETWORK_ENABLE
+ * Text Domain: plugin-name-td
+ * Domain Path: plugin-languages
+ * Network: false
  *
- * @package $PLUGIN_PACKAGE
+ * @package PluginPackage
  *
- * Copyright (C) $PLUGIN_COPYRIGHT_YEAR $PLUGIN_AUTHOR
+ * Copyright (C) copyright_year Rheinard Korf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,13 +32,13 @@
  */
 
 /**
- * Class $PLUGIN_NAMESPACE
+ * Class PluginTemplateNS
  *
  * This class is responsible for setting up the autoloader of the plugin.
  *
- * NOTE: This class is outside of the $PLUGIN_NAMESPACE namespace.
+ * NOTE: This class is outside of the PluginTemplateNS namespace.
  */
-class $PLUGIN_NAMESPACE {
+class PluginTemplateNS {
 
 	/**
 	 * Plugin information.
@@ -48,7 +48,7 @@ class $PLUGIN_NAMESPACE {
 	private $info = array();
 
 	/**
-	 * $PLUGIN_NAMESPACE constructor.
+	 * PluginTemplateNS constructor.
 	 */
 	public function __construct() {
 
@@ -87,7 +87,7 @@ class $PLUGIN_NAMESPACE {
 		$autoloader_path = $this->info['include_dir'] . 'class-autoloader.php';
 		if ( is_readable( $autoloader_path ) ) {
 			require_once $autoloader_path;
-			$autoloader = '$PLUGIN_NAMESPACE\Autoloader';
+			$autoloader = 'PluginTemplateNS\Autoloader';
 			$autoloader = new $autoloader();
 			$autoloader->register( $this->info['include_dir'] );
 		}
@@ -111,7 +111,7 @@ class $PLUGIN_NAMESPACE {
 	 * @return string
 	 */
 	private function version_fail_text() {
-		return __( '$PLUGIN_NAME plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 5.3 or higher.', '$PLUGIN_TEXT_DOMAIN' );
+		return __( 'PluginName plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 5.3 or higher.', 'plugin-name-td' );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class $PLUGIN_NAMESPACE {
 	 */
 	public function installation_fail() {
 		// Translators: This can't be translated if the plugin has an installation failure.
-		$message      = esc_html( sprintf( '%s has not been properly installed. Please remove the plugin and try reinstalling.', '$PLUGIN_NAME' ) );
+		$message      = esc_html( sprintf( '%s has not been properly installed. Please remove the plugin and try reinstalling.', 'PluginName' ) );
 		$html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
 
 		echo wp_kses_post( $html_message );
@@ -160,12 +160,12 @@ class $PLUGIN_NAMESPACE {
 	/**
 	 * Load the plugin's text domain.
 	 *
-	 * Look for $PLUGIN_TEXT_DOMAIN-<locale>.mo file and load it.
+	 * Look for plugin-name-td-<locale>.mo file and load it.
 	 *
-	 * e.g. $PLUGIN_TEXT_DOMAIN-en_US.mo
+	 * e.g. plugin-name-td-en_US.mo
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( '$PLUGIN_TEXT_DOMAIN', false, $this->info['languages_dir'] );
+		load_plugin_textdomain( 'plugin-name-td', false, $this->info['languages_dir'] );
 	}
 
 	/**
@@ -248,14 +248,14 @@ class $PLUGIN_NAMESPACE {
 		/**
 		 * Create core plugin object.
 		 */
-		global $$PLUGIN_GLOBAL_OBJECT;
-		$core = '$PLUGIN_NAMESPACE\Plugin';
-		$$PLUGIN_GLOBAL_OBJECT = new $core( $this->info );
+		global $plugin_name_object;
+		$core = 'PluginTemplateNS\Plugin';
+		$plugin_name_object = new $core( $this->info );
 	}
 }
 
 /**
  * LAUNCH!
  */
-$$PLUGIN_GLOBAL_OBJECT_bootstrap = new $PLUGIN_NAMESPACE();
-$$PLUGIN_GLOBAL_OBJECT_bootstrap->launch_plugin();
+$plugin_name_object_bootstrap = new PluginTemplateNS();
+$plugin_name_object_bootstrap->launch_plugin();

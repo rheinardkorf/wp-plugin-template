@@ -1,6 +1,6 @@
 <?php
 /**
- * This file describes the base class for all $PLUGIN_NAME objects.
+ * This file describes the base class for all PluginName objects.
  *
  * Hooks by Reflection:
  * Methods can be used to hook into WordPress actions and filters by specifying @action or @filter in the method's doc
@@ -13,10 +13,10 @@
  *
  * If <priority> is not defined a default of 10 will be used.
  *
- * @package $PLUGIN_PACKAGE
+ * @package PluginPackage
  */
 
-namespace $PLUGIN_NAMESPACE;
+namespace PluginTemplateNS;
 
 /**
  * Class Base

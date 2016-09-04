@@ -1,25 +1,25 @@
 <?php
 /**
- * This file handles core functionality of $PLUGIN_NAME.
+ * This file handles core functionality of PluginName.
  *
- * @package $PLUGIN_PACKAGE
+ * @package PluginPackage
  */
 
-namespace $PLUGIN_NAMESPACE;
+namespace PluginTemplateNS;
 
 /**
  * Class Plugin
  */
 class Plugin extends Base {
 
-	const SETTINGS_KEY = '$PLUGIN_SETTINGS_KEY';
-	const HOOK_PREFIX = '$PLUGIN_HOOK_PREFIX';
-	const MENU_PARENT = '$PLUGIN_MENU_SLUG';
-	const MENU_PARENT_TITLE = '$PLUGIN_MENU_NAME';
-	const PAGE_HOOK_BASE = '$PLUGIN_PAGE_BASE_SLUG';
-	const PRIMARY_JS_SLUG = '$PLUGIN_JS_SLUG';
-	const PRIMARY_JS_OBJECT = '$PLUGIN_JS_OBJECT';
-	const PRIMARY_CSS_SLUG = '$PLUGIN_CSS_SLUG';
+	const SETTINGS_KEY = 'plugin-settings-key';
+	const HOOK_PREFIX = 'plugin_hook_prefix';
+	const MENU_PARENT = 'plugin_menu_slug';
+	const MENU_PARENT_TITLE = 'PluginMenu';
+	const PAGE_HOOK_BASE = 'plugin-page-slug';
+	const PRIMARY_JS_SLUG = 'plugin-js-slug';
+	const PRIMARY_JS_OBJECT = 'plugin-js-object';
+	const PRIMARY_CSS_SLUG = 'plugin-css-slug';
 
 	/**
 	 * Array containing all the important plugin information.
@@ -31,7 +31,7 @@ class Plugin extends Base {
 	/**
 	 * Get an instance of the plugin.
 	 *
-	 * @return \$PLUGIN_NAMESPACE\Plugin
+	 * @return \PluginTemplateNS\Plugin
 	 */
 	public static function instance() {
 		global $$PLUGIN_GLOBAL_OBJECT;
