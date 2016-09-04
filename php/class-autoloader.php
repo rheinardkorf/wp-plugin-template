@@ -2,10 +2,10 @@
 /**
  * This file defines the Autoloader class.
  *
- * @package $PLUGIN_PACKAGE
+ * @package PluginPackage
  */
 
-namespace $PLUGIN_NAMESPACE;
+namespace PluginTemplateNS;
 
 /**
  * Class Autoloader
@@ -46,8 +46,8 @@ class Autoloader {
 	 */
 	public function autoload( $class ) {
 
-		// If its not a $PLUGIN_NAMESPACE class, exit now.
-		if ( ! preg_match( '/^$PLUGIN_NAMESPACE/', $class ) ) {
+		// If its not a PluginTemplateNS class, exit now.
+		if ( ! preg_match( '/^PluginTemplateNS/', $class ) ) {
 			return false;
 		}
 
@@ -63,7 +63,7 @@ class Autoloader {
 		}
 
 		$class_parts = explode( '\\', $matches['namespace'] );
-		if ( ! empty( $class_parts ) && '$PLUGIN_NAMESPACE' === $class_parts[0] ) {
+		if ( ! empty( $class_parts ) && 'PluginTemplateNS' === $class_parts[0] ) {
 			array_shift( $class_parts );
 		} else {
 			return false;
@@ -80,7 +80,7 @@ class Autoloader {
 		if ( ! empty( $class_string ) ) {
 
 			// One last chance to override the filename.
-			$filename = apply_filters( '$PLUGIN_HOOK_PREFIX_class_file_override', $basedir . 'class-' . $class_string . '.php', $class );
+			$filename = apply_filters( 'plugin_hook_prefix_class_file_override', $basedir . 'class-' . $class_string . '.php', $class );
 
 			// Include it if it exists and we have access.
 			if ( is_readable( $filename ) ) {

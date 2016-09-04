@@ -2,10 +2,10 @@
 /**
  * This file contains convenient methods for actions required throughout the plugin.
  *
- * @package $PLUGIN_PACKAGE
+ * @package PluginPackage
  */
 
-namespace $PLUGIN_NAMESPACE;
+namespace PluginTemplateNS;
 
 /**
  * Class Utility
@@ -151,7 +151,7 @@ class Utility {
 			$allowed_html = array_merge( $allowed_html, $extra_html );
 		}
 
-		$allowed_html = apply_filters( '$PLUGIN_HOOK_PREFIX_allowed_html', $allowed_html );
+		$allowed_html = apply_filters( 'plugin_hook_prefix_allowed_html', $allowed_html );
 
 		echo wp_kses( $content, $allowed_html );
 	}
