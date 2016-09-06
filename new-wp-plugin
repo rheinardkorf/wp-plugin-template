@@ -3,7 +3,8 @@
 ###############################################################################
 # Defaults
 ###############################################################################
-defaultTemplateRepo="git@bitbucket.org:rheinard/plugin-template.git"
+# defaultTemplateRepo="git@bitbucket.org:rheinard/plugin-template.git"
+defaultTemplateRepo="git@github.com:rheinardkorf/wp-plugin-template.git"
 defaultDestinationPath="."
 currentYear=$(date +"%Y")
 defaultAuthor="Rheinard Korf"
