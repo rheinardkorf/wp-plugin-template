@@ -27,39 +27,43 @@ Hooks.filters = Hooks.filters || {}; // Registered filters
 /**
  * Add a new Action callback to Hooks.actions
  *
- * @param tag The tag specified by do_action()
- * @param callback The callback function to call when do_action() is called
- * @param priority The order in which to call the callbacks. Default: 10 (like WordPress)
+ * @param {string} tag The tag specified by do_action()
+ * @param {{}} callback The callback function to call when do_action() is called
+ * @param {number} priority The order in which to call the callbacks. Default: 10 (like WordPress)
+ * @returns {void}
  */
-Hooks.add_action = function ( tag, callback, priority ) {
+Hooks.add_action = function( tag, callback, priority ) {
+	'use strict';
 
-	if ( typeof priority === "undefined" ) {
-		priority = 10;
+	var _priority = priority;
+	if ( 'undefined' === typeof priority ) {
+		_priority = 10;
 	}
 
 	// If the tag doesn't exist, create it.
 	Hooks.actions[tag] = Hooks.actions[tag] || [];
-	Hooks.actions[tag].push( {priority: priority, callback: callback} );
-
+	Hooks.actions[tag].push( { priority: _priority, callback: callback } );
 };
 
 /**
  * Add a new Filter callback to Hooks.filters
  *
- * @param tag The tag specified by apply_filters()
- * @param callback The callback function to call when apply_filters() is called
- * @param priority Priority of filter to apply. Default: 10 (like WordPress)
+ * @param {string} tag The tag specified by apply_filters()
+ * @param {{}} callback The callback function to call when apply_filters() is called
+ * @param {number} priority Priority of filter to apply. Default: 10 (like WordPress)
+ * @returns {void}
  */
-Hooks.add_filter = function ( tag, callback, priority ) {
+Hooks.add_filter = function( tag, callback, priority ) {
+	'use strict';
 
-	if ( typeof priority === "undefined" ) {
-		priority = 10;
+	var _priority = priority;
+	if ( 'undefined' === typeof priority ) {
+		_priority = 10;
 	}
 
 	// If the tag doesn't exist, create it.
 	Hooks.filters[tag] = Hooks.filters[tag] || [];
-	Hooks.filters[tag].push( {priority: priority, callback: callback} );
-
+	Hooks.filters[tag].push( { priority: _priority, callback: callback } );
 };
 
 /**
@@ -67,17 +71,21 @@ Hooks.add_filter = function ( tag, callback, priority ) {
  *
  * Must be the exact same callback signature.
  * Warning: Anonymous functions can not be removed.
-
- * @param tag The tag specified by do_action()
- * @param callback The callback function to remove
+ *
+ * @param {string} tag The tag specified by do_action()
+ * @param {{}} callback The callback function to remove
+ * @returns {void}
  */
-Hooks.remove_action = function ( tag, callback ) {
+Hooks.remove_action = function( tag, callback ) {
+	'use strict';
+	var spliceSize = 1;
 
 	Hooks.actions[tag] = Hooks.actions[tag] || [];
 
-	Hooks.actions[tag].forEach( function ( filter, i ) {
+	Hooks.actions[tag].forEach( function( filter, i ) {
 		if ( filter.callback === callback ) {
-			Hooks.actions[tag].splice( i, 1 );
+
+			Hooks.actions[tag].splice( i, spliceSize );
 		}
 	} );
 };
@@ -87,17 +95,20 @@ Hooks.remove_action = function ( tag, callback ) {
  *
  * Must be the exact same callback signature.
  * Warning: Anonymous functions can not be removed.
-
- * @param tag The tag specified by apply_filters()
- * @param callback The callback function to remove
+ *
+ * @param {string} tag The tag specified by apply_filters()
+ * @param {{}} callback The callback function to remove
+ * @returns {void}
  */
-Hooks.remove_filter = function ( tag, callback ) {
+Hooks.remove_filter = function( tag, callback ) {
+	'use strict';
+	var spliceSize = 1;
 
 	Hooks.filters[tag] = Hooks.filters[tag] || [];
 
-	Hooks.filters[tag].forEach( function ( filter, i ) {
+	Hooks.filters[tag].forEach( function( filter, i ) {
 		if ( filter.callback === callback ) {
-			Hooks.filters[tag].splice( i, 1 );
+			Hooks.filters[tag].splice( i, spliceSize );
 		}
 	} );
 };
@@ -106,26 +117,27 @@ Hooks.remove_filter = function ( tag, callback ) {
  * Calls actions that are stored in Hooks.actions for a specific tag or nothing
  * if there are no actions to call.
  *
- * @param tag A registered tag in Hook.actions
- * @param options
- * @options Optional JavaScript object to pass to the callbacks
+ * @param {string} tag A registered tag in Hook.actions
+ * @param {{}} options Optional JavaScript object to pass to the callbacks
+ * @return {void}
  */
-Hooks.do_action = function ( tag, options ) {
-
+Hooks.do_action = function( tag, options ) {
+	'use strict';
 	var actions = [];
 
-	if ( typeof Hooks.actions[tag] !== "undefined" && Hooks.actions[tag].length > 0 ) {
+	/*eslint no-magic-numbers: ["error", { "ignore": [0] }]*/
+	if ( 'undefined' !== typeof Hooks.actions[tag] && Hooks.actions[tag].length > 0 ) {
 
-		Hooks.actions[tag].forEach( function ( hook ) {
+		Hooks.actions[tag].forEach( function( hook ) {
 
 			actions[hook.priority] = actions[hook.priority] || [];
 			actions[hook.priority].push( hook.callback );
 
 		} );
 
-		actions.forEach( function ( hooks ) {
+		actions.forEach( function( hooks ) {
 
-			hooks.forEach( function ( callback ) {
+			hooks.forEach( function( callback ) {
 				callback( options );
 			} );
 
@@ -138,31 +150,32 @@ Hooks.do_action = function ( tag, options ) {
  * Calls filters that are stored in Hooks.filters for a specific tag or return
  * original value if no filters exist.
  *
- * @param tag  A registered tag in Hook.filters
- * @param value
- * @param options Optional JavaScript object to pass to the callbacks
- * @returns {*}
+ * @param {string} tag  A registered tag in Hook.filters
+ * @param {*} value Value to pass to filter
+ * @param {{}} options Optional JavaScript object to pass to the callbacks
+ * @returns {*} Filtered value
  */
-Hooks.apply_filters = function ( tag, value, options ) {
+Hooks.apply_filters = function( tag, value, options ) {
+	'use strict';
 
-	var filters = [];
+	var filters = [],
+		_value = value;
 
-	if ( typeof Hooks.filters[tag] !== "undefined" && Hooks.filters[tag].length > 0 ) {
+	if ( 'undefined' !== typeof Hooks.filters[tag] && Hooks.filters[tag].length > 0 ) {
 
-		Hooks.filters[tag].forEach( function ( hook ) {
-
+		Hooks.filters[tag].forEach( function( hook ) {
 			filters[hook.priority] = filters[hook.priority] || [];
 			filters[hook.priority].push( hook.callback );
 		} );
 
-		filters.forEach( function ( hooks ) {
-
-			hooks.forEach( function ( callback ) {
-				value = callback( value, options );
+		filters.forEach( function( hooks ) {
+			hooks.forEach( function( callback ) {
+				/* eslint-disable */
+				_value = callback( _value, options );
+				/* eslint-enable */
 			} );
-
 		} );
 	}
 
-	return value;
+	return _value;
 };

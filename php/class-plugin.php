@@ -34,9 +34,9 @@ class Plugin extends Base {
 	 * @return \PluginTemplateNS\Plugin
 	 */
 	public static function instance() {
-		global $$PLUGIN_GLOBAL_OBJECT;
+		global $plugin_name_object;
 
-		return $$PLUGIN_GLOBAL_OBJECT;
+		return $plugin_name_object;
 	}
 
 	/**
@@ -78,9 +78,7 @@ class Plugin extends Base {
 	 * Render the primary admin menu.
 	 */
 	public function render_main_plugin_page() {
-		/**
-		 * @todo: Render the primary plugin page
-		 */
+		/** @todo: Render the primary plugin page */
 		echo 'Hello World!'; // WPCS: xss ok.
 	}
 
