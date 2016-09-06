@@ -1,0 +1,385 @@
+#!/bin/bash
+
+###############################################################################
+# Defaults
+###############################################################################
+defaultTemplateRepo="git@bitbucket.org:rheinard/plugin-template.git"
+defaultDestinationPath="."
+currentYear=$(date +"%Y")
+defaultAuthor="Rheinard Korf"
+defaultAuthorURI="http://rheinardkorf.com"
+defaultVersion="0.1-alpha"
+defaultNetworkMode="false"
+defaultTDPath="languages"
+currentDirectory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+###############################################################################
+# Colors and formatting
+###############################################################################
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+LIME_YELLOW=$(tput setaf 190)
+POWDER_BLUE=$(tput setaf 153)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+BLINK=$(tput blink)
+REVERSE=$(tput smso)
+UNDERLINE=$(tput smul)
+
+###############################################################################
+# CLI Arguments
+###############################################################################
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    -ns|--namespace)
+        pluginNamespace="$2"
+        shift
+    ;;
+    -pkg|--package)
+        pluginPackage="$2"
+        shift
+    ;;
+    -uri|--uri)
+        pluginURI="$2"
+        shift
+    ;;
+    -d|--description)
+        pluginDescription="$2"
+        shift
+    ;;
+    -v|--version)
+        pluginVersion="$2"
+        shift
+    ;;
+    -a|--author)
+        pluginAuthor="$2"
+        shift
+    ;;
+    -auri|--author-uri)
+        pluginAuthorURI="$2"
+        shift
+    ;;
+    -td|--text-domain)
+        pluginTextDomain="$2"
+        shift
+    ;;
+    -l|--languages-path)
+        pluginLanguagesPath="$2"
+        shift
+    ;;
+    -nw|--network)
+        pluginNetworkEnabled="$2"
+        shift
+    ;;
+    -c|--copyright-year)
+        pluginCopyrightYear="$2"
+        shift
+    ;;
+    -i|--interactive)
+        interactive="yes"
+        shift
+    ;;
+    -go|--global-object)
+        pluginGlobalObject="$2"
+        shift
+    ;;
+    -sk|--settings-key)
+        pluginSettingsKey="$2"
+        shift
+    ;;
+    -hpre|--hook-prefix)
+        pluginHookPrefix="$2"
+        shift
+    ;;
+
+    -mslug|--menu-slug)
+        pluginMenuSlug="$2"
+        shift
+    ;;
+
+    -mtitle|--menu-title)
+        pluginMenuTitle="$2"
+        shift
+    ;;
+
+    -pslug|--page-slug)
+        pluginPageSlug="$2"
+        shift
+    ;;
+
+    -jslug|--js-slugg)
+        pluginJSSlug="$2"
+        shift
+    ;;
+
+    -jobj|--js-object)
+        pluginJSObject="$2"
+        shift
+    ;;
+
+    -cslug|--css-slug)
+        pluginCSSSlug="$2"
+        shift
+    ;;
+    -f|--plugin-file)
+        pluginFile="$2"
+        shift # past argument
+    ;;
+    -t|--template)
+        templateRepo="$2"
+        shift # past argument
+    ;;
+    -p|--path)
+        destinationPath="$2"
+        shift # past argument
+    ;;
+    *)
+        pluginName="$1"
+    ;;
+esac
+shift # past argument or value
+done
+
+# Some string manipulation of plugin name.
+pluginNameLower="$(tr [A-Z] [a-z] <<< "$pluginName")"
+pluginNameLowerDash="${pluginNameLower// /-}"
+pluginNameLowerUnderscore="${pluginNameLower// /_}"
+pluginClass="${pluginName// /}"
+
+# Setup some defaults
+if [ -z "$pluginNamespace" ] ; then pluginNamespace="$pluginClass"; fi
+if [ -z "$pluginPackage" ] ; then pluginPackage="$pluginClass"; fi
+if [ -z "$pluginURI" ] ; then pluginURI="$defaultAuthorURI"; fi
+if [ -z "$pluginDescription" ] ; then pluginDescription="This is the $pluginName plugin."; fi
+if [ -z "$pluginVersion" ] ; then pluginVersion="$defaultVersion"; fi
+if [ -z "$pluginAuthor" ] ; then pluginAuthor="$defaultAuthor"; fi
+if [ -z "$pluginAuthorURI" ] ; then pluginAuthorURI="$defaultAuthorURI"; fi
+if [ -z "$pluginTextDomain" ] ; then pluginTextDomain="$pluginNameLowerDash"; fi
+if [ -z "$pluginLanguagesPath" ] ; then pluginLanguagesPath="$defaultTDPath"; fi
+if [ -z "$pluginNetworkEnabled" ] ; then pluginNetworkEnabled="$defaultNetworkMode"; fi
+if [ -z "$pluginCopyrightYear" ] ; then pluginCopyrightYear="$currentYear"; fi
+if [ -z "$pluginGlobalObject" ] ; then pluginGlobalObject="${pluginNameLowerUnderscore}_plugin"; fi
+if [ -z "$pluginSettingsKey" ] ; then pluginSettingsKey="$pluginNameLowerDash"; fi
+if [ -z "$pluginHookPrefix" ] ; then pluginHookPrefix="$pluginNameLowerDash"; fi
+if [ -z "$pluginMenuSlug" ] ; then pluginMenuSlug="$pluginNameLowerDash"; fi
+if [ -z "$pluginMenuTitle" ] ; then pluginMenuTitle="$pluginName"; fi
+if [ -z "$pluginPageSlug" ] ; then pluginPageSlug="$pluginNameLowerDash"; fi
+if [ -z "$pluginJSSlug" ] ; then pluginJSSlug="$pluginNameLowerDash"; fi
+if [ -z "$pluginJSObject" ] ; then pluginJSObject="$pluginClass"; fi
+if [ -z "$pluginCSSSlug" ] ; then pluginCSSSlug="$pluginNameLowerDash"; fi
+if [ -z "$pluginFile" ] ; then pluginFile="${pluginNameLowerDash}.php"; fi
+
+# Use default template if arg not passed
+if [ -z "$templateRepo" ]; then
+    templateRepo="$defaultTemplateRepo"
+fi
+
+# Use default destination if arg not passed
+if [ -z "$destinationPath" ]; then
+    destinationPath="$defaultDestinationPath"
+fi
+
+###############################################################################
+# Get input from user
+###############################################################################\
+function e {
+
+    if [ -z "$3" ]; then
+        default=''
+    else
+        default=" [${POWDER_BLUE}$3${WHITE}]"
+    fi
+
+    printf "${RED}${2}${WHITE}${1}${default}: "
+}
+
+if ! [ -z "$interactive" ] ; then
+
+    printf "${YELLOW}Input plugin details...\n"
+    printf "=====================================${WHITE}\n"
+
+    e "Plugin Filename" " " "$pluginFile"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginFile="$userInput"; fi
+
+    e "Plugin Name" " " "$pluginName"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginName="$userInput"; fi
+
+    e "Plugin Namespace" " " "$pluginNamespace"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginNamespace="$userInput"; fi
+
+    e "Plugin Package" " " "$pluginPackage"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginPackage="$userInput"; fi
+
+    e "Plugin URI" " " "$pluginURI"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginURI="$userInput"; fi
+
+    e "Plugin Description" " " "$pluginDescription"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginDescription="$userInput"; fi
+
+    e "Plugin Version" " " "$pluginVersion"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginVersion="$userInput"; fi
+
+    e "Plugin Author" " " "$pluginAuthor"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginAuthor="$userInput"; fi
+
+    e "Author URI" " " "$pluginAuthorURI"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginAuthorURI="$userInput"; fi
+
+    e "Plugin Textdomain" " " "$pluginTextDomain"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginTextDomain="$userInput"; fi
+
+    e "Textdomain Path" " " "$pluginLanguagesPath"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginLanguagesPath="$userInput"; fi
+
+
+    e "Network plugin (true|false)" " " "$pluginNetworkEnabled"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginNetworkEnabled="$userInput"; fi
+
+    e "Copyright Year" " " "$pluginCopyrightYear"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginCopyrightYear="$userInput"; fi
+
+    e "Global plugin object (no $)" " " "$pluginGlobalObject"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginGlobalObject="$userInput"; fi
+
+    e "Plugin Settings Key" " " "$pluginSettingsKey"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginSettingsKey="$userInput"; fi
+
+    e "Hook Prefix" " " "$pluginHookPrefix"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginHookPrefix="$userInput"; fi
+
+    e "Menu Slug" " " "$pluginMenuSlug"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginMenuSlug="$userInput"; fi
+
+    e "Menu Title" " " "$pluginMenuTitle"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginMenuTitle="$userInput"; fi
+
+    e "Base Page Slug" " " "$pluginPageSlug"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginPageSlug="$userInput"; fi
+
+    e "Primary JS Slug" " " "$pluginJSSlug"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginJSSlug="$userInput"; fi
+
+    e "Primary JS Object" " " "$pluginJSObject"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginJSObject="$userInput"; fi
+
+    e "Primary CSS Slug" " " "$pluginCSSSlug"
+    read userInput
+    if ! [[ -z "$userInput" ]]; then pluginCSSSlug="$userInput"; fi
+fi
+
+pluginNetworkEnabled='Network: ${pluginNetworkEnabled}'
+
+###############################################################################
+# Clone Plugin
+###############################################################################
+printf "${YELLOW}Getting plugin template...\n"
+printf "=====================================${WHITE}\n"
+mkdir -p "$destinationPath"
+cd "$destinationPath"
+cloneCommand="git clone $templateRepo ."
+$($cloneCommand)
+rm -rf .git
+git init
+
+###############################################################################
+# Renaming placeholders
+###############################################################################
+printf "${YELLOW}Renaming placeholders\n${WHITE}"
+
+LC_ALL=C find "." -type f -exec sed -i '' \
+    -e "s/PluginTemplateNS/$pluginNamespace/" \
+    -e "s/PluginName/$pluginName/" \
+    -e "s/PluginPackage/$pluginPackage/" \
+    -e "s,http:\/\/pluginuri.com,$pluginURI," \
+    -e "s/PluginDescription/$pluginDescription/" \
+    -e "s/0\.0\.0/$pluginVersion/" \
+    -e "s,http:\/\/rheinardkorf.com,$pluginAuthorURI," \
+    -e "s/Rheinard Korf/$pluginAuthor/" \
+    -e "s/plugin-name-td/$pluginTextDomain/" \
+    -e "s/plugin-languages/$pluginLanguagesPath/" \
+    -e "s/Network: false/$pluginNetworkEnabled/" \
+    -e "s/copyright_year/$pluginCopyrightYear/" \
+    -e "s/plugin_name_object/$pluginGlobalObject/" \
+    -e "s/plugin-settings-key/$pluginSettingsKey/" \
+    -e "s/plugin_hook_prefix/$pluginHookPrefix/" \
+    -e "s/plugin_menu_slug/$pluginMenuSlug/" \
+    -e "s/PluginMenu/$pluginMenuTitle/" \
+    -e "s/plugin-page-slug/$pluginPageSlug/" \
+    -e "s/plugin-js-slug/$pluginJSSlug/" \
+    -e "s/plugin-js-object/$pluginJSObject/" \
+    -e "s/plugin-css-slug/$plugin-css-slug/" \
+    -e "s/package-name/$pluginNameLowerDash/" \
+    {} \;
+
+$(mv PLUGINFILE.php $pluginFile)
+
+###############################################################################
+# Setup WP-DEV-LIB
+###############################################################################
+printf "${YELLOW}Setup wp-dev-lib...\n"
+printf "=====================================${WHITE}\n"
+git submodule add -b master https://github.com/xwp/wp-dev-lib.git dev-lib
+./dev-lib/install-pre-commit-hook.sh
+ln -s dev-lib/phpunit-plugin.xml phpunit.xml.dist && git add phpunit.xml.dist # (if working with a plugin)
+ln -s dev-lib/.jshintrc . && git add .jshintrc
+ln -s dev-lib/.jscsrc . && git add .jscsrc
+ln -s dev-lib/.eslintrc . && git add .eslintrc
+ln -s dev-lib/.eslintignore . && git add .eslintignore
+ln -s dev-lib/.editorconfig . && git add .editorconfig
+cp dev-lib/.jshintignore . && git add .jshintignore # don't use symlink for this
+
+###############################################################################
+# Setup ESLint
+###############################################################################
+printf "${YELLOW}Setup ESLint support...\n"
+printf "=====================================${WHITE}\n"
+npm install --save-dev eslint
+git add package.json
+echo 'node_modules' >> .gitignore
+git add .gitignore
+
+###############################################################################
+# Setup Travis CI
+###############################################################################
+printf "${YELLOW}Setup Travis CI support...\n${WHITE}"
+cp dev-lib/.travis.yml .
+
+###############################################################################
+# Add initial commit
+###############################################################################
+printf "${YELLOW}Initial commit...\n${WHITE}"
+git add . -A
+git commit -m"Initial commit."
+
+printf "${YELLOW}=====================================\n"
+printf "${GREEN}DONE!\n"
+printf "${YELLOW}=====================================${WHITE}\n"
