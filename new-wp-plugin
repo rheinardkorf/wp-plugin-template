@@ -115,7 +115,7 @@ case $key in
         shift
     ;;
 
-    -jslug|--js-slugg)
+    -jslug|--js-slug)
         pluginJSSlug="$2"
         shift
     ;;
