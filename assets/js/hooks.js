@@ -35,7 +35,7 @@ Hooks.filters = Hooks.filters || {}; // Registered filters
 Hooks.add_action = function( tag, callback, priority ) {
     'use strict';
 
-    var defaultPriority = 10,
+    var defaultPriority = 10, // Define default to avoid magic number warning
         _priority = priority || defaultPriority;
 
     // If the tag doesn't exist, create it.
