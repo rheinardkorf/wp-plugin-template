@@ -169,7 +169,7 @@ if [ -z "$pluginNetworkEnabled" ] ; then pluginNetworkEnabled="$defaultNetworkMo
 if [ -z "$pluginCopyrightYear" ] ; then pluginCopyrightYear="$currentYear"; fi
 if [ -z "$pluginGlobalObject" ] ; then pluginGlobalObject="${pluginNameLowerUnderscore}_plugin"; fi
 if [ -z "$pluginSettingsKey" ] ; then pluginSettingsKey="$pluginNameLowerDash"; fi
-if [ -z "$pluginHookPrefix" ] ; then pluginHookPrefix="$pluginNameLowerDash"; fi
+if [ -z "$pluginHookPrefix" ] ; then pluginHookPrefix="$pluginNameLowerUnderscore"; fi
 if [ -z "$pluginMenuSlug" ] ; then pluginMenuSlug="$pluginNameLowerDash"; fi
 if [ -z "$pluginMenuTitle" ] ; then pluginMenuTitle="$pluginName"; fi
 if [ -z "$pluginPageSlug" ] ; then pluginPageSlug="$pluginNameLowerDash"; fi
@@ -185,7 +185,7 @@ fi
 
 # Use default destination if arg not passed
 if [ -z "$destinationPath" ]; then
-    destinationPath="$defaultDestinationPath"
+    destinationPath="./$pluginNameLowerDash"
 fi
 
 ###############################################################################
@@ -317,6 +317,7 @@ git init
 printf "${YELLOW}Renaming placeholders\n${WHITE}"
 
 LC_ALL=C find "." -type f -exec sed -i '' \
+    -e "s/plugin-name-td/$pluginTextDomain/" \
     -e "s/PluginTemplateNS/$pluginNamespace/" \
     -e "s/PluginName/$pluginName/" \
     -e "s/PluginPackage/$pluginPackage/" \
@@ -325,7 +326,6 @@ LC_ALL=C find "." -type f -exec sed -i '' \
     -e "s/0\.0\.0/$pluginVersion/" \
     -e "s,http:\/\/rheinardkorf.com,$pluginAuthorURI," \
     -e "s/Rheinard Korf/$pluginAuthor/" \
-    -e "s/plugin-name-td/$pluginTextDomain/" \
     -e "s/plugin-languages/$pluginLanguagesPath/" \
     -e "s/Network: false/$pluginNetworkEnabled/" \
     -e "s/copyright_year/$pluginCopyrightYear/" \
@@ -337,7 +337,7 @@ LC_ALL=C find "." -type f -exec sed -i '' \
     -e "s/plugin-page-slug/$pluginPageSlug/" \
     -e "s/plugin-js-slug/$pluginJSSlug/" \
     -e "s/plugin-js-object/$pluginJSObject/" \
-    -e "s/plugin-css-slug/$plugin-css-slug/" \
+    -e "s/plugin-css-slug/$pluginCSSSlug/" \
     -e "s/package-name/$pluginNameLowerDash/" \
     {} \;
 
@@ -381,6 +381,7 @@ printf "${YELLOW}Initial commit...\n${WHITE}"
 git add . -A
 git commit -m"Initial commit."
 
+rm new-wp-plugin
 printf "${YELLOW}=====================================\n"
 printf "${GREEN}DONE!\n"
 printf "${YELLOW}=====================================${WHITE}\n"

@@ -33,16 +33,14 @@ Hooks.filters = Hooks.filters || {}; // Registered filters
  * @returns {void}
  */
 Hooks.add_action = function( tag, callback, priority ) {
-	'use strict';
+    'use strict';
 
-	var _priority = priority;
-	if ( 'undefined' === typeof priority ) {
-		_priority = 10;
-	}
+    var defaultPriority = 10,
+        _priority = priority || defaultPriority;
 
-	// If the tag doesn't exist, create it.
-	Hooks.actions[tag] = Hooks.actions[tag] || [];
-	Hooks.actions[tag].push( { priority: _priority, callback: callback } );
+    // If the tag doesn't exist, create it.
+    Hooks.actions[tag] = Hooks.actions[tag] || [];
+    Hooks.actions[tag].push( { priority: _priority, callback: callback } );
 };
 
 /**
@@ -54,16 +52,14 @@ Hooks.add_action = function( tag, callback, priority ) {
  * @returns {void}
  */
 Hooks.add_filter = function( tag, callback, priority ) {
-	'use strict';
+    'use strict';
 
-	var _priority = priority;
-	if ( 'undefined' === typeof priority ) {
-		_priority = 10;
-	}
+    var defaultPriority = 10,
+        _priority = priority || defaultPriority;
 
-	// If the tag doesn't exist, create it.
-	Hooks.filters[tag] = Hooks.filters[tag] || [];
-	Hooks.filters[tag].push( { priority: _priority, callback: callback } );
+    // If the tag doesn't exist, create it.
+    Hooks.filters[tag] = Hooks.filters[tag] || [];
+    Hooks.filters[tag].push( { priority: _priority, callback: callback } );
 };
 
 /**
@@ -77,17 +73,17 @@ Hooks.add_filter = function( tag, callback, priority ) {
  * @returns {void}
  */
 Hooks.remove_action = function( tag, callback ) {
-	'use strict';
-	var spliceSize = 1;
+    'use strict';
+    var spliceSize = 1;
 
-	Hooks.actions[tag] = Hooks.actions[tag] || [];
+    Hooks.actions[tag] = Hooks.actions[tag] || [];
 
-	Hooks.actions[tag].forEach( function( filter, i ) {
-		if ( filter.callback === callback ) {
+    Hooks.actions[tag].forEach( function( filter, i ) {
+        if ( filter.callback === callback ) {
 
-			Hooks.actions[tag].splice( i, spliceSize );
-		}
-	} );
+            Hooks.actions[tag].splice( i, spliceSize );
+        }
+    } );
 };
 
 /**
@@ -101,16 +97,16 @@ Hooks.remove_action = function( tag, callback ) {
  * @returns {void}
  */
 Hooks.remove_filter = function( tag, callback ) {
-	'use strict';
-	var spliceSize = 1;
+    'use strict';
+    var spliceSize = 1;
 
-	Hooks.filters[tag] = Hooks.filters[tag] || [];
+    Hooks.filters[tag] = Hooks.filters[tag] || [];
 
-	Hooks.filters[tag].forEach( function( filter, i ) {
-		if ( filter.callback === callback ) {
-			Hooks.filters[tag].splice( i, spliceSize );
-		}
-	} );
+    Hooks.filters[tag].forEach( function( filter, i ) {
+        if ( filter.callback === callback ) {
+            Hooks.filters[tag].splice( i, spliceSize );
+        }
+    } );
 };
 
 /**
@@ -122,27 +118,27 @@ Hooks.remove_filter = function( tag, callback ) {
  * @return {void}
  */
 Hooks.do_action = function( tag, options ) {
-	'use strict';
-	var actions = [];
+    'use strict';
+    var actions = [];
 
-	/*eslint no-magic-numbers: ["error", { "ignore": [0] }]*/
-	if ( 'undefined' !== typeof Hooks.actions[tag] && Hooks.actions[tag].length > 0 ) {
+    /*eslint no-magic-numbers: ["error", { "ignore": [0] }]*/
+    if ( 'undefined' !== typeof Hooks.actions[tag] && Hooks.actions[tag].length > 0 ) {
 
-		Hooks.actions[tag].forEach( function( hook ) {
+        Hooks.actions[tag].forEach( function( hook ) {
 
-			actions[hook.priority] = actions[hook.priority] || [];
-			actions[hook.priority].push( hook.callback );
+            actions[hook.priority] = actions[hook.priority] || [];
+            actions[hook.priority].push( hook.callback );
 
-		} );
+        } );
 
-		actions.forEach( function( hooks ) {
+        actions.forEach( function( hooks ) {
 
-			hooks.forEach( function( callback ) {
-				callback( options );
-			} );
+            hooks.forEach( function( callback ) {
+                callback( options );
+            } );
 
-		} );
-	}
+        } );
+    }
 
 };
 
@@ -156,26 +152,26 @@ Hooks.do_action = function( tag, options ) {
  * @returns {*} Filtered value
  */
 Hooks.apply_filters = function( tag, value, options ) {
-	'use strict';
+    'use strict';
 
-	var filters = [],
-		_value = value;
+    var filters = [],
+        _value = value;
 
-	if ( 'undefined' !== typeof Hooks.filters[tag] && Hooks.filters[tag].length > 0 ) {
+    if ( 'undefined' !== typeof Hooks.filters[tag] && Hooks.filters[tag].length > 0 ) {
 
-		Hooks.filters[tag].forEach( function( hook ) {
-			filters[hook.priority] = filters[hook.priority] || [];
-			filters[hook.priority].push( hook.callback );
-		} );
+        Hooks.filters[tag].forEach( function( hook ) {
+            filters[hook.priority] = filters[hook.priority] || [];
+            filters[hook.priority].push( hook.callback );
+        } );
 
-		filters.forEach( function( hooks ) {
-			hooks.forEach( function( callback ) {
-				/* eslint-disable */
-				_value = callback( _value, options );
-				/* eslint-enable */
-			} );
-		} );
-	}
+        filters.forEach( function( hooks ) {
+            hooks.forEach( function( callback ) {
+                /* eslint-disable */
+                _value = callback( _value, options );
+                /* eslint-enable */
+            } );
+        } );
+    }
 
-	return _value;
+    return _value;
 };
