@@ -40,188 +40,189 @@
  */
 class PluginTemplateNS {
 
-    /**
-     * Plugin information.
-     *
-     * @var array|bool|mixed
-     */
-    private $info = array();
+	/**
+	 * Plugin information.
+	 *
+	 * @var array|bool|mixed
+	 */
+	private $info = array();
 
-    /**
-     * PluginTemplateNS constructor.
-     */
-    public function __construct() {
+	/**
+	 * PluginTemplateNS constructor.
+	 */
+	public function __construct() {
 
-        /**
-         * If not correct version of PHP, then no point in continuing.
-         */
-        if ( version_compare( phpversion(), '5.3', '<' ) ) {
-            if ( defined( 'WP_CLI' ) ) {
-                WP_CLI::warning( $this->version_fail_text() );
-            } else {
-                add_action( 'admin_notices', array( $this, 'version_fail' ) );
-            }
-            return;
-        }
+		/**
+		 * If not correct version of PHP, then no point in continuing.
+		 */
+		if ( version_compare( phpversion(), '5.3', '<' ) ) {
+			if ( defined( 'WP_CLI' ) ) {
+				WP_CLI::warning( $this->version_fail_text() );
+			} else {
+				add_action( 'admin_notices', array( $this, 'version_fail' ) );
+			}
 
-        $data = array(
-            '__FILE__'       => __FILE__,
-            'library_path'   => 'php',
-            'assets_path'    => 'assets',
-            'api_version'    => '1',
-        );
-        $data = array_merge( $data, $this->parse_header_information() );
-        $this->info = $this->setup_paths( $data );
+			return;
+		}
 
-        /**
-         * If paths are messed up we need to alert the admin.
-         */
-        if ( empty( $this->info['base_name'] ) ) {
-            add_action( 'shutdown', array( $this, 'installation_fail' ) );
-            return;
-        }
+		$data       = array(
+			'__FILE__'     => __FILE__,
+			'library_path' => 'php',
+			'assets_path'  => 'assets',
+			'api_version'  => '1',
+		);
+		$data       = array_merge( $data, $this->parse_header_information() );
+		$this->info = $this->setup_paths( $data );
 
-        /**
-         * Register the Autoloader.
-         */
-        $autoloader_path = $this->info['include_dir'] . 'class-autoloader.php';
-        if ( is_readable( $autoloader_path ) ) {
-            require_once $autoloader_path;
-            $autoloader = 'PluginTemplateNS\Autoloader';
-            $autoloader = new $autoloader();
-            $autoloader->register( $this->info['include_dir'] );
-        }
+		/**
+		 * If paths are messed up we need to alert the admin.
+		 */
+		if ( empty( $this->info['base_name'] ) ) {
+			add_action( 'shutdown', array( $this, 'installation_fail' ) );
 
-        /**
-         * Load the plugin's text domain.
-         */
-        add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
-    }
+			return;
+		}
 
-    /**
-     * Admin notice for incorrect PHP version.
-     */
-    public function version_fail() {
-        printf( '<div class="error"><p>%s</p></div>', esc_html( $this->version_fail_text() ) );
-    }
+		/**
+		 * Register the Autoloader.
+		 */
+		$autoloader_path = $this->info['include_dir'] . 'class-autoloader.php';
+		if ( is_readable( $autoloader_path ) ) {
+			require_once $autoloader_path;
+			$autoloader = 'PluginTemplateNS\Autoloader';
+			$autoloader = new $autoloader();
+			$autoloader->register( $this->info['include_dir'] );
+		}
 
-    /**
-     * Version failure error message
-     *
-     * @return string
-     */
-    private function version_fail_text() {
-        return __( 'PluginName plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 5.3 or higher.', 'plugin-name-td' );
-    }
+		/**
+		 * Load the plugin's text domain.
+		 */
+		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+	}
 
-    /**
-     * Paths not correctly setup.
-     */
-    public function installation_fail() {
-        // Translators: This can't be translated if the plugin has an installation failure.
-        $message      = esc_html( sprintf( '%s has not been properly installed. Please remove the plugin and try reinstalling.', 'PluginName' ) );
-        $html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
+	/**
+	 * Admin notice for incorrect PHP version.
+	 */
+	public function version_fail() {
+		printf( '<div class="error"><p>%s</p></div>', esc_html( $this->version_fail_text() ) );
+	}
 
-        echo wp_kses_post( $html_message );
-    }
+	/**
+	 * Version failure error message
+	 *
+	 * @return string
+	 */
+	private function version_fail_text() {
+		return __( 'PluginName plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 5.3 or higher.', 'plugin-name-td' );
+	}
 
-    /* ---- Convenience Methods ---- */
+	/**
+	 * Paths not correctly setup.
+	 */
+	public function installation_fail() {
+		// Translators: This can't be translated if the plugin has an installation failure.
+		$message      = esc_html( sprintf( '%s has not been properly installed. Please remove the plugin and try reinstalling.', 'PluginName' ) );
+		$html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
 
-    /**
-     * Load the plugin's text domain.
-     *
-     * Look for plugin-name-td-<locale>.mo file and load it.
-     *
-     * e.g. plugin-name-td-en_US.mo
-     */
-    public function load_textdomain() {
-        load_plugin_textdomain( 'plugin-name-td', false, $this->info['languages_dir'] );
-    }
+		echo wp_kses_post( $html_message );
+	}
 
-    /**
-     * Prevent cloning
-     */
-    private function __clone() {
-        return;
-    }
+	/* ---- Convenience Methods ---- */
 
-    /**
-     * Prevent unserializing
-     */
-    private function __wakeup() {
-        return;
-    }
+	/**
+	 * Load the plugin's text domain.
+	 *
+	 * Look for plugin-name-td-<locale>.mo file and load it.
+	 *
+	 * e.g. plugin-name-td-en_US.mo
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'plugin-name-td', false, $this->info['languages_dir'] );
+	}
 
-    /**
-     * Parse file header information into plugin $info.
-     */
-    private function parse_header_information() {
-        $default_headers = array(
-            'name'        => 'Plugin Name',
-            'plugin_uri'  => 'Plugin URI',
-            'version'     => 'Version',
-            'description' => 'Description',
-            'author'      => 'Author',
-            'author_uri'  => 'Author URI',
-            'text_domain' => 'Text Domain',
-            'domain_path' => 'Domain Path',
-            'network'     => 'Network',
-        );
+	/**
+	 * Prevent cloning
+	 */
+	private function __clone() {
+		return;
+	}
 
-        return get_file_data( __FILE__, $default_headers, 'plugin' );
-    }
+	/**
+	 * Prevent unserializing
+	 */
+	private function __wakeup() {
+		return;
+	}
 
-    /**
-     * Get plugin locations and paths.
-     *
-     * @param array $data Plugin information.
-     *
-     * @return bool|mixed
-     */
-    private function setup_paths( $data ) {
+	/**
+	 * Parse file header information into plugin $info.
+	 */
+	private function parse_header_information() {
+		$default_headers = array(
+			'name'        => 'Plugin Name',
+			'plugin_uri'  => 'Plugin URI',
+			'version'     => 'Version',
+			'description' => 'Description',
+			'author'      => 'Author',
+			'author_uri'  => 'Author URI',
+			'text_domain' => 'Text Domain',
+			'domain_path' => 'Domain Path',
+			'network'     => 'Network',
+		);
 
-        if ( defined( 'WP_PLUGIN_URL' ) && defined( 'WP_PLUGIN_DIR' ) && file_exists( plugin_dir_path( __FILE__ ) . basename( __FILE__ ) ) ) {
-            /**
-             * Normal Plugin Location
-             */
-            $data['location']   = 'plugins';
-            $data['plugin_dir'] = plugin_dir_path( __FILE__ );
-            $data['plugin_url'] = plugins_url( '/', __FILE__ );
+		return get_file_data( __FILE__, $default_headers, 'plugin' );
+	}
 
-            // Must use plugin location.
-        } elseif ( defined( 'WPMU_PLUGIN_URL' ) && defined( 'WPMU_PLUGIN_DIR' ) && file_exists( WPMU_PLUGIN_DIR . DIRECTORY_SEPARATOR . basename( __FILE__ ) ) ) {
-            /**
-             * "Must-Use" Plugin Location
-             */
-            $data['location']   = 'mu-plugins';
-            $data['plugin_dir'] = WPMU_PLUGIN_DIR . DIRECTORY_SEPARATOR;
-            $data['plugin_url'] = WPMU_PLUGIN_URL . '/';
-        } else {
-            return false;
-        }
+	/**
+	 * Get plugin locations and paths.
+	 *
+	 * @param array $data Plugin information.
+	 *
+	 * @return bool|mixed
+	 */
+	private function setup_paths( $data ) {
 
-        $data['base_name']     = dirname( plugin_basename( __FILE__ ) );
-        $data['include_dir']   = $data['plugin_dir'] . $data['library_path'] . DIRECTORY_SEPARATOR;
-        $data['include_url']   = $data['plugin_url'] . $data['library_path'] . DIRECTORY_SEPARATOR;
-        $data['assets_dir']    = $data['plugin_dir'] . $data['assets_path'] . DIRECTORY_SEPARATOR;
-        $data['assets_url']    = $data['plugin_url'] . $data['assets_path'] . DIRECTORY_SEPARATOR;
-        $data['languages_dir'] = $data['plugin_dir'] . trim( $data['domain_path'], '/' ) . DIRECTORY_SEPARATOR;
-        $data['languages_url'] = $data['plugin_url'] . trim( $data['domain_path'], '/' ) . DIRECTORY_SEPARATOR;
+		if ( defined( 'WP_PLUGIN_URL' ) && defined( 'WP_PLUGIN_DIR' ) && file_exists( plugin_dir_path( __FILE__ ) . basename( __FILE__ ) ) ) {
+			/**
+			 * Normal Plugin Location
+			 */
+			$data['location']   = 'plugins';
+			$data['plugin_dir'] = plugin_dir_path( __FILE__ );
+			$data['plugin_url'] = plugins_url( '/', __FILE__ );
+			// Must use plugin location.
+		} elseif ( defined( 'WPMU_PLUGIN_URL' ) && defined( 'WPMU_PLUGIN_DIR' ) && file_exists( WPMU_PLUGIN_DIR . DIRECTORY_SEPARATOR . basename( __FILE__ ) ) ) {
+			/**
+			 * "Must-Use" Plugin Location
+			 */
+			$data['location']   = 'mu-plugins';
+			$data['plugin_dir'] = WPMU_PLUGIN_DIR . DIRECTORY_SEPARATOR;
+			$data['plugin_url'] = WPMU_PLUGIN_URL . '/';
+		} else {
+			return false;
+		}
 
-        return $data;
-    }
+		$data['base_name']     = dirname( plugin_basename( __FILE__ ) );
+		$data['include_dir']   = $data['plugin_dir'] . $data['library_path'] . DIRECTORY_SEPARATOR;
+		$data['include_url']   = $data['plugin_url'] . $data['library_path'] . DIRECTORY_SEPARATOR;
+		$data['assets_dir']    = $data['plugin_dir'] . $data['assets_path'] . DIRECTORY_SEPARATOR;
+		$data['assets_url']    = $data['plugin_url'] . $data['assets_path'] . DIRECTORY_SEPARATOR;
+		$data['languages_dir'] = $data['plugin_dir'] . trim( $data['domain_path'], '/' ) . DIRECTORY_SEPARATOR;
+		$data['languages_url'] = $data['plugin_url'] . trim( $data['domain_path'], '/' ) . DIRECTORY_SEPARATOR;
 
-    /**
-     * Create the primary plugin object.
-     */
-    public function launch_plugin() {
-        /**
-         * Create core plugin object.
-         */
-        global $plugin_name_object;
-        $core = 'PluginTemplateNS\Plugin';
-        $plugin_name_object = new $core( $this->info );
-    }
+		return $data;
+	}
+
+	/**
+	 * Create the primary plugin object.
+	 */
+	public function launch_plugin() {
+		/**
+		 * Create core plugin object.
+		 */
+		global $plugin_name_object;
+		$core               = 'PluginTemplateNS\Plugin';
+		$plugin_name_object = new $core( $this->info );
+	}
 }
 
 /**
